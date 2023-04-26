@@ -90,3 +90,19 @@ impl<const M: usize, const N: usize> Add<&Matrix<M, N>> for &Matrix<M, N> {
         self.add(other)
     }
 }
+
+impl<const M: usize, const N: usize> fmt::Display for Matrix<M, N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for col in self.data {
+            write!(f, "| ")?;
+
+            for val in col {
+                write!(f, "{:>8}", format!("{:.2}", val))?;
+            }
+
+            writeln!(f, " |")?;
+        }
+
+        Ok(())
+    }
+}
