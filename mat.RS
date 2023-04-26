@@ -58,6 +58,20 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
         
         result
     }
+
+    fn transpose(&self) -> Matrix<N, M> {
+        let mut result = Matrix::<N, M>::zeros();
+        for i in 0..M{
+            for j in 0..N{
+                result[j][i] = self[i][j]
+            }
+        }
+        return result
+    }
+
+    pub fn from_data(data: [[f64; N]; M]) -> Self {
+        Self { data }
+    }
 }
 
 impl<const M: usize, const N: usize, const P: usize> Mul<&Matrix<N,P>> for &Matrix<M, N>{
