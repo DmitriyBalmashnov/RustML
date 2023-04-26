@@ -12,7 +12,7 @@ There are projects which already do just this probably better - this is just my 
 
 Tasks:
 
-[ ] Create a rudimentary Matrix implementation for my use
-[ ] Implement gradient descent for Linear regression
-[ ] Implement Logistic regression
-[ ] Explore further
+[ ] Create a rudimentary Matrix implementation for my use  
+[ ] Implement gradient descent for Linear regression  
+[ ] Implement Logistic regression  
+[ ] Explore further  
