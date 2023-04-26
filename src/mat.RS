@@ -1,6 +1,5 @@
 use std::ops::{Add, Mul, Index, IndexMut};
 use std::fmt;
-use std::borrow::Borrow;
 
 #[derive(Clone)]
 struct Matrix<const M: usize, const N: usize> {
@@ -10,17 +9,15 @@ struct Matrix<const M: usize, const N: usize> {
 type Vector<const M: usize> = Matrix<M, 1>;
 
 impl<const M: usize, const N: usize> Index<usize> for Matrix<M, N> {
-    type Output = [f64; N]
+    type Output = [f64; N];
     
     fn index(&self, idx:usize) -> &Self::Output{
         return &self.data[idx]
     }
 }
 
-impl<const M: usize, const N: usize> IndexMut<usize> for Matrix<M, N> {
-    type Output = [f64; N]
-    
-    fn index(&mut self, idx:usize) -> &mut Self::Output{
+impl<const M: usize, const N: usize> IndexMut<usize> for Matrix<M, N> {    
+    fn index_mut(&mut self, idx:usize) -> &mut Self::Output{
         return &mut self.data[idx]
     }
 }
@@ -104,5 +101,42 @@ impl<const M: usize, const N: usize> fmt::Display for Matrix<M, N> {
         }
 
         Ok(())
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use mat::{Matrix, Vector};
+
+    #[test]
+    fn additition() {
+        let a = Matrix::from_data([[1.0, 2.0], [3.0, 4.0]]);
+        let b = Matrix::from_data([[5.0, 6.0], [7.0, 8.0]]);
+
+        let c = &a + &b;
+
+        let expected = [[6.0, 8.0], [10.0, 12.0]];
+        assert_eq!(c.data, expected)
+    }
+
+    #[test]
+    fn multiplication_square() {
+        let a = Matrix::from_data([[2.0, 0.0], [0.0, 9.0]]);
+        let b = &a * &a;
+
+        let expected = [[4.0, 0.0], [0.0, 81.0]];
+        assert_eq!(b.data, expected)
+    }
+
+    #[test]
+    fn multiplication_uneq() {
+        let a = Matrix::from_data([[2.0, 1.0], [4.0, 3.0]]);
+        let b = Vector::from_data([[3.0], [7.0]]);
+
+        let c = &a * &b;
+
+        let expected = [[13.0], [33.0]];
+        assert_eq!(c.data, expected)
     }
 }
