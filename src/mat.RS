@@ -71,11 +71,25 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
     }
 }
 
+impl<const M: usize> Vector<M> {
+
+    fn length(self) -> f64{
+        return f64::sqrt(self.dot(&self))
+    }
+
+    fn dot(&self, other: &Self) -> f64 {
+        let mut sum = 0.0;
+        for i in 0..M {
+            sum += self[i][0] * other[i][0]
+        }
+        return sum
+    }
+}
+
 impl<const M: usize, const N: usize, const P: usize> Mul<&Matrix<N,P>> for &Matrix<M, N>{
     type Output = Matrix<M, P>;
 
-    fn mul(self, other: &Matrix<N, P>) ->
-     Matrix<M, P> {
+    fn mul(self, other: &Matrix<N, P>) -> Matrix<M, P> {
         self.multiply(&other)
     }
 }
@@ -138,5 +152,23 @@ mod test {
 
         let expected = [[13.0], [33.0]];
         assert_eq!(c.data, expected)
+    }
+
+    #[test]
+    fn dot() {
+        let a = Vector::from_data([[3.0], [2.0]]);
+        let b = Vector::from_data([[5.0], [7.0]]);
+        let c = a.dot(&b);
+
+        let expected = 29.0;
+        assert_eq!(c, expected)
+    }
+
+    #[test]
+    fn length() {
+        let a = Vector::from_data([[4.0], [3.0]]).length();
+        let expected = 5.0;
+
+        assert_eq!(a, expected)
     }
 }
