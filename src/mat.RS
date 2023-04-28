@@ -1,12 +1,12 @@
-use std::ops::{Add, Mul, Index, IndexMut};
+use std::ops::{Add, Mul, Sub, Index, IndexMut};
 use std::fmt;
 
 #[derive(Clone)]
-struct Matrix<const M: usize, const N: usize> {
+pub struct Matrix<const M: usize, const N: usize> {
     data: [[f64; N]; M]
 }
 
-type Vector<const M: usize> = Matrix<M, 1>;
+pub type Vector<const M: usize> = Matrix<M, 1>;
 
 impl<const M: usize, const N: usize> Index<usize> for Matrix<M, N> {
     type Output = [f64; N];
@@ -24,7 +24,7 @@ impl<const M: usize, const N: usize> IndexMut<usize> for Matrix<M, N> {
 
 impl<const M: usize, const N: usize> Matrix<M, N> {
     
-    fn zeros() -> Self {
+    pub fn zeros() -> Self {
         Matrix {
             data: [[0.0; N]; M],
         }
@@ -33,9 +33,20 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
     fn add(&self, other: &Self) -> Matrix<M,N> {
         let mut result = Matrix::zeros();
         
-        for i in 0..N {
-            for j in 0..M {
+        for i in 0..M {
+            for j in 0..N {
                 result[i][j] = self[i][j] + other[i][j]
+            }
+        }
+        result
+    }
+
+    fn subtract(&self, other: &Self) -> Matrix<M, N> {
+        let mut result = Matrix::zeros();
+        
+        for i in 0..M {
+            for j in 0..N {
+                result[i][j] = self[i][j] - other[i][j]
             }
         }
         result
@@ -73,7 +84,7 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
 
 impl<const M: usize> Vector<M> {
 
-    fn length(self) -> f64{
+    pub fn length(self) -> f64{
         return f64::sqrt(self.dot(&self))
     }
 
@@ -90,7 +101,7 @@ impl<const M: usize, const N: usize, const P: usize> Mul<&Matrix<N,P>> for &Matr
     type Output = Matrix<M, P>;
 
     fn mul(self, other: &Matrix<N, P>) -> Matrix<M, P> {
-        self.multiply(&other)
+        return self.multiply(&other)
     }
 }
 
@@ -98,7 +109,15 @@ impl<const M: usize, const N: usize> Add<&Matrix<M, N>> for &Matrix<M, N> {
     type Output = Matrix<M, N>;
 
     fn add(self, other: &Matrix<M, N>) -> Matrix<M, N> {
-        self.add(other)
+        return self.add(other)
+    }
+}
+
+impl<const M: usize, const N: usize> Sub<&Matrix<M, N>> for &Matrix<M, N> {
+    type Output = Matrix<M, N>;
+
+    fn sub(self, other: &Matrix<M,N>) -> Matrix<M, N> {
+        return self.subtract(other)
     }
 }
 
@@ -125,12 +144,24 @@ mod test {
 
     #[test]
     fn additition() {
-        let a = Matrix::from_data([[1.0, 2.0], [3.0, 4.0]]);
-        let b = Matrix::from_data([[5.0, 6.0], [7.0, 8.0]]);
+        let a = Matrix::from_data([[1.0, 2.0, 5.0], [3.0, 4.0, 3.0]]);
+        let b = Matrix::from_data([[5.0, 6.0, 9.0], [7.0, 8.0, 8.0]]);
 
         let c = &a + &b;
 
-        let expected = [[6.0, 8.0], [10.0, 12.0]];
+        let expected = [[6.0, 8.0, 14.0], [10.0, 12.0, 11.0]];
+        assert_eq!(c.data, expected)
+    }
+
+    
+    #[test]
+    fn subtraction() {
+        let a = Matrix::from_data([[1.0, 2.0, 3.0], [3.0, 4.0, 9.0]]);
+        let b = Matrix::from_data([[8.0, 7.0, 3.0], [6.0, 5.0, 2.0]]);
+
+        let c = &a - &b;
+
+        let expected = [[-7.0, -5.0, 0.0], [-3.0, -1.0, 7.0]];
         assert_eq!(c.data, expected)
     }
 
