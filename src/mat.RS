@@ -67,7 +67,17 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
         result
     }
 
-    fn transpose(&self) -> Matrix<N, M> {
+    pub fn sum_rows(&self) -> Matrix<N, 1> {
+        let mut result = Matrix::<N, 1>::zeros();
+        for i in 0..M {
+            for j in 0..N {
+                result[0][j] += result[i][j];
+            }
+        }
+        return result;
+    }
+
+    pub fn transpose(&self) -> Matrix<N, M> {
         let mut result = Matrix::<N, M>::zeros();
         for i in 0..M{
             for j in 0..N{
@@ -79,6 +89,10 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
 
     pub fn from_data(data: [[f64; N]; M]) -> Self {
         Self { data }
+    }
+
+    pub fn to_data(self) -> [[f64; N]; M] {
+        return self.data.clone()
     }
 }
 
@@ -95,6 +109,14 @@ impl<const M: usize> Vector<M> {
         }
         return sum
     }
+
+    pub fn from_array(data: [f64; M]) -> Self {
+        let mut new_data = [[0.0; 1];M];
+        for i in 0..M { 
+            new_data[i][0] = data[i]
+        }
+        return Vector{data:new_data}
+    }
 }
 
 impl<const M: usize, const N: usize, const P: usize> Mul<&Matrix<N,P>> for &Matrix<M, N>{
@@ -102,6 +124,20 @@ impl<const M: usize, const N: usize, const P: usize> Mul<&Matrix<N,P>> for &Matr
 
     fn mul(self, other: &Matrix<N, P>) -> Matrix<M, P> {
         return self.multiply(&other)
+    }
+}
+
+impl<const M: usize, const N: usize> Mul<&Matrix<M, N>> for f64 {
+    type Output = Matrix<M, N>;
+
+    fn mul(self, other: &Matrix<M, N>) -> Matrix<M, N> {
+        let mut result = Matrix::<M,N>::zeros();
+        for i in 0..M {
+            for j in 0..N {
+                result[i][j] = self*other[i][j]
+            }
+        }
+        return result
     }
 }
 
