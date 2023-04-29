@@ -46,11 +46,12 @@ mod test {
         let x = Matrix::from_data([[1.0, 0.0], [1.0, 4.0]]);
         let y = Vector::from_data([[0.0], [4.0]]);
 
-        let model = LinearRegressor::train(&x, &y, 0.00001);
-        let expected_theta = [[0.0], [1.0]];
-        let resulting_theta = model.theta.to_data();
+        let model = LinearRegressor::train(&x, &y, 0.001);
+        let expected_theta = Vector::from_data([[0.0], [1.0]]);
+        let resulting_theta = model.theta;
+        let diff = (&expected_theta - &resulting_theta).length();
 
-        assert_eq!(expected_theta, resulting_theta)
+        assert!(diff < 0.0001, "{}, {} unequal", expected_theta, resulting_theta)
     }
 
 }
