@@ -49,9 +49,22 @@ mod test {
         let model = LinearRegressor::train(&x, &y, 0.001);
         let expected_theta = Vector::from_data([[0.0], [1.0]]);
         let resulting_theta = model.theta;
-        let diff = (&expected_theta - &resulting_theta).length();
+        let error = (&expected_theta - &resulting_theta).length();
 
-        assert!(diff < 0.0001, "{}, {} unequal", expected_theta, resulting_theta)
+        assert!(error < 0.0001, "{}, {} unequal", expected_theta, resulting_theta)
+    }
+
+    #[test]
+    fn simple_fit_bias() {
+        let x = Matrix::from_data([[1.0, 0.0], [1.0, 4.0]]);
+        let y = Vector::from_data([[2.0], [0.0]]);
+
+        let model = LinearRegressor::train(&x, &y, 0.001);
+        let expected_theta = Vector::from_data([[2.0], [-0.5]]);
+        let resulting_theta = model.theta;
+        let error = (&expected_theta - &resulting_theta).length();
+
+        assert!(error < 0.0001, "{}, {} unequal", expected_theta, resulting_theta)
     }
 
 }
