@@ -1,11 +1,11 @@
 use mat::{Matrix, Vector};
 
-struct LinearRegressor<const M: usize, const N: usize> {
+pub struct LinearRegressor<const M: usize, const N: usize> {
     theta: Vector<N>
 }
 
 impl<const M: usize, const N: usize> LinearRegressor<M, N> {
-    fn train(x: &Matrix<M, N>, y:&Vector<M>, learning_rate: f64) -> Self {
+    pub fn train(x: &Matrix<M, N>, y:&Vector<M>, learning_rate: f64) -> Self {
         let initial_theta = Vector::<N>::zeros();
         let mut curr_model = LinearRegressor{theta: initial_theta};
         let mut prev_error = f64::MAX;
@@ -18,7 +18,7 @@ impl<const M: usize, const N: usize> LinearRegressor<M, N> {
         return curr_model;
     }
 
-    fn predict(&self, x: &Matrix<M, N>) -> Vector<M> {
+    pub fn predict(&self, x: &Matrix<M, N>) -> Vector<M> {
         return x * &self.theta;
     }
 
