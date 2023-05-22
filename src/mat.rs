@@ -1,5 +1,6 @@
 use std::ops::{Add, Mul, Sub, Index, IndexMut};
 use std::fmt;
+use std::error::Error;
 
 #[derive(Clone)]
 pub struct Matrix<const M: usize, const N: usize> {
@@ -95,6 +96,53 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
         return self.data.clone()
     }
 }
+
+impl<const M: usize> Matrix<M, M> {
+    pub fn identity() -> Matrix<M, M> {
+        let mut result = Matrix::zeros();
+        for i in 0..M {
+            result[i][i] = 1.0;
+        }
+        return result
+    }
+
+    pub fn inverse(&self) -> Option<Matrix<M, M>> {
+        let mut result = Matrix::<M,M>::identity();
+        let mut curr = self.clone();
+        for i in 0..M {
+            let (max_idx, max) = curr.max_abs_in_col(i, i);
+            if max == 0.0 {
+                return None
+            }
+            if max_idx > i {
+                //perform hoisting;
+                //swap max to current_row for all columns in the max_row
+                for j in 0..M {
+                    (curr[i][j], curr[max_idx][j]) = (curr[max_idx][j], curr[i][j]);
+                    (result[i][j], result[max_idx][j]) = (result[max_idx][j], result[i][j]);
+                }
+            }
+            //perform gaussian elimination
+        }
+        return Some(result)
+    }
+
+    fn max_abs_in_col(&self, j: usize, min_index: usize) -> (usize, f64) {
+        let mut max = 0.0;
+        let mut max_idx = 0;
+
+        for i in min_index..M {
+            let abs_val = self[i][j].abs();
+            if abs_val > max {
+                max = abs_val;
+                max_idx = i;
+            }
+        }
+
+        return (max_idx, max)
+    }
+}
+
 
 impl<const M: usize> Vector<M> {
 
