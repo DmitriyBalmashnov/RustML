@@ -6,4 +6,5 @@ path = "src/main.Rs"
 
 [dependencies]
 csv="1.1"
+nalgebra = "0.32.2"
 serde = { version = "1", features=["derive"]}

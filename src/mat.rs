@@ -1,6 +1,12 @@
 use std::ops::{Add, Mul, Sub, Index, IndexMut};
 use std::fmt;
 use std::error::Error;
+extern crate nalgebra as na;
+use na::Dyn;
+
+use self::na::Matrix as nam;
+use self::na::Dynamic;
+use self::na::SMatrix;
 
 #[derive(Clone)]
 pub struct Matrix<const M: usize, const N: usize> {
@@ -94,6 +100,19 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
 
     pub fn to_data(self) -> [[f64; N]; M] {
         return self.data.clone()
+    }
+
+    pub fn pseudo_inverse(&self) -> Matrix<N, M>{
+        //Use nalgebra svd implementation
+        let flat_data: &[f64] = self.data.iter().flatten().map(|x| *x).collect::<Vec<f64>>().as_slice();
+        let matrix: nam<f64, Dyn, Dyn, na::ArrayStorage<f64, M, N>> = nam::<f64, Dyn, Dyn, na::ArrayStorage<f64, M, N>>::from_row_slice(flat_data);
+        let svd = matrix.svd(true, true);
+
+        let ps_i = svd.pseudo_inverse().unwrap();
+        let mut result = Matrix::<N, M>::zeros();
+        for i in 0..N { for j in 0..M { result[i][j] = ps_i[(i, j)]}}
+
+        return result;
     }
 }
 
