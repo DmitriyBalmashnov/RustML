@@ -2,6 +2,8 @@
 name = "ml_rs" # the name of the package
 version = "0.0.1"    # the current version, obeying semver
 authors = ["Dmitriy Balmashnov <dmitri.balmashnov@gmail.com>"]
+path = "src/main.Rs"
+
 [dependencies]
 csv="1.1"
 serde = { version = "1", features=["derive"]}
