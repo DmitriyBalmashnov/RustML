@@ -6,7 +6,8 @@ pub struct LinearRegressor<const M: usize, const N: usize> {
 
 pub enum Optimizer{
     NaiveGradient(f64),
-    Adam(AdamParams)
+    Adam(AdamParams),
+    PseudoInverse
 }
 
 impl Optimizer {
@@ -14,6 +15,7 @@ impl Optimizer {
         match self {
             Self::NaiveGradient(learning_rate) => naive(*learning_rate, linreg, x, y),
             Self::Adam(params) => adam(params, linreg, x, y),
+            Self::PseudoInverse => pseudo_inverse_solve(linreg, x, y),
         }
     }
 }
@@ -57,6 +59,14 @@ fn adam<const M: usize, const N: usize>(params: &AdamParams, linreg: &mut Linear
         }
     }
     return curr_error
+}
+
+fn pseudo_inverse_solve<const M: usize, const N: usize>(linreg: &mut LinearRegressor<M, N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
+    let pseudo_inverse = x.pseudo_inverse();
+    let theta_hat = &pseudo_inverse* &y;
+    linreg.theta = theta_hat;
+    let y_hat = linreg.batch_predict(x);
+    return (y-&y_hat).length();
 }
 
 pub struct AdamParams{
@@ -122,6 +132,19 @@ mod test {
         let y = Vector::from_data([[0.0], [4.0]]);
 
         let model = LinearRegressor::train(&x, &y, Optimizer::Adam(AdamParams::default()));
+        let expected_theta = Vector::from_data([[0.0], [1.0]]);
+        let resulting_theta = model.theta;
+        let error = (&expected_theta - &resulting_theta).length();
+
+        assert!(error < 0.0001, "{}, {} unequal", expected_theta, resulting_theta)
+    }
+
+    #[test]
+    fn simple_fit_psi() {
+        let x = Matrix::from_data([[1.0, 0.0], [1.0, 4.0]]);
+        let y = Vector::from_data([[0.0], [4.0]]);
+
+        let model = LinearRegressor::train(&x, &y, Optimizer::PseudoInverse);
         let expected_theta = Vector::from_data([[0.0], [1.0]]);
         let resulting_theta = model.theta;
         let error = (&expected_theta - &resulting_theta).length();
