@@ -16,3 +16,5 @@ Tasks:
 [X] Implement gradient descent for Linear regression  
 [ ] Implement Logistic regression  
 [ ] Explore further  
+
+Example given in the main.rs makes use of the housing prices dataset found at: https://www.kaggle.com/datasets/ashydv/housing-dataset?resource=download

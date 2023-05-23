@@ -102,7 +102,15 @@ impl<const M: usize> Vector<M> {
         return f64::sqrt(self.dot(&self))
     }
 
-    fn dot(&self, other: &Self) -> f64 {
+    pub fn pow(&self, power: f64) -> Self{
+        let mut new_data = [[0.0; 1];M];
+        for i in 0..M {
+            new_data[i][0] = f64::powf(self[i][0], power);
+        }
+        return Vector{data:new_data}
+    }
+
+    pub fn dot(&self, other: &Self) -> f64 {
         let mut sum = 0.0;
         for i in 0..M {
             sum += self[i][0] * other[i][0]
