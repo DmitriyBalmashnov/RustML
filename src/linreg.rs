@@ -1,6 +1,6 @@
 use mat::{Matrix, Vector};
 
-pub struct LinearRegressor<const M: usize, const N: usize> {
+pub struct LinearRegressor<const N: usize> {
     theta: Vector<N>
 }
 
@@ -11,7 +11,7 @@ pub enum Optimizer{
 }
 
 impl Optimizer {
-    fn optimize<const M: usize, const N: usize>(&self, linreg: &mut LinearRegressor<M, N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
+    fn optimize<const M: usize, const N: usize>(&self, linreg: &mut LinearRegressor<N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
         match self {
             Self::NaiveGradient(learning_rate) => naive(*learning_rate, linreg, x, y),
             Self::Adam(params) => adam(params, linreg, x, y),
@@ -19,7 +19,7 @@ impl Optimizer {
         }
     }
 }
-fn naive<const M: usize, const N: usize>(learning_rate: f64, linreg: &mut LinearRegressor<M, N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
+fn naive<const M: usize, const N: usize>(learning_rate: f64, linreg: &mut LinearRegressor<N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
     let mut prev_error = f64::MAX;
     let mut curr_error = 0.0;
     while (prev_error - curr_error).abs() > f64::EPSILON {
@@ -31,7 +31,7 @@ fn naive<const M: usize, const N: usize>(learning_rate: f64, linreg: &mut Linear
     return curr_error
 }
 
-fn adam<const M: usize, const N: usize>(params: &AdamParams, linreg: &mut LinearRegressor<M, N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
+fn adam<const M: usize, const N: usize>(params: &AdamParams, linreg: &mut LinearRegressor<N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
     let mut timestep = 0;
     let mut prev_error = f64::MAX;
     let mut curr_error = 0.0;
@@ -61,7 +61,7 @@ fn adam<const M: usize, const N: usize>(params: &AdamParams, linreg: &mut Linear
     return curr_error
 }
 
-fn pseudo_inverse_solve<const M: usize, const N: usize>(linreg: &mut LinearRegressor<M, N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
+fn pseudo_inverse_solve<const M: usize, const N: usize>(linreg: &mut LinearRegressor<N>, x: &Matrix<M, N>, y: &Vector<M>) -> f64 {
     let pseudo_inverse = x.pseudo_inverse();
     let theta_hat = &pseudo_inverse* &y;
     linreg.theta = theta_hat;
@@ -81,8 +81,8 @@ impl Default for AdamParams{
     }
 }
 
-impl<const M: usize, const N: usize> LinearRegressor<M, N> {
-    pub fn train(x: &Matrix<M, N>, y:&Vector<M>, opt: Optimizer) -> Self {
+impl<const N: usize> LinearRegressor<N> {
+    pub fn train<const M: usize>(x: &Matrix<M, N>, y:&Vector<M>, opt: Optimizer) -> Self {
         let initial_theta = Vector::<N>::zeros();
         let mut curr_model = LinearRegressor{theta: initial_theta};
         let mse = opt.optimize(&mut curr_model, x, y);
@@ -90,7 +90,7 @@ impl<const M: usize, const N: usize> LinearRegressor<M, N> {
         return curr_model;
     }
 
-    pub fn batch_predict(&self, x: &Matrix<M, N>) -> Vector<M> {
+    pub fn batch_predict<const M: usize>(&self, x: &Matrix<M, N>) -> Vector<M> {
         return x * &self.theta;
     }
 
@@ -98,7 +98,7 @@ impl<const M: usize, const N: usize> LinearRegressor<M, N> {
         return (&x.transpose() * &self.theta)[0][0];
     }
 
-    pub fn gradient(&self, x: &Matrix<M, N>, y:&Vector<M>, y_hat:&Vector<M>) -> Vector<N> {
+    pub fn gradient<const M: usize>(&self, x: &Matrix<M, N>, y:&Vector<M>, y_hat:&Vector<M>) -> Vector<N> {
         let mut gradient = Vector::<N>::zeros();
         for i in 0..M {
             for j in 0..N{
