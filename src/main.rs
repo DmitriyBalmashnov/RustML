@@ -5,8 +5,10 @@ use serde::Deserialize;
 use std::convert::TryInto;
 mod mat;
 mod linreg;
+mod optimizer;
 use mat::{Matrix, Vector};
-use linreg::{LinearRegressor, Optimizer, AdamParams};
+use linreg::{LinearRegressor};
+use optimizer::{Optimizer};
 
 #[derive(Deserialize, Debug)]
 struct HouseData {
@@ -53,7 +55,7 @@ fn main() {
     let path = Path::new(".").join("data").join("Housing.csv").into_os_string().into_string().unwrap();
     let houses = match read_houses(&path) {
         Ok(houses) => houses,
-        Error => panic!("file doesn't exist"),
+        _ => panic!("file doesn't exist"),
     };
     println!("{:?}, {}", houses[0], houses.len());
     let housedata = Houses {data: house_vec_to_arr::<545>(houses)};
