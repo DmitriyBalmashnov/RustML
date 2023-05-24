@@ -85,7 +85,8 @@ impl<const M: usize, const N: usize> LinearRegressor<M, N> {
     pub fn train(x: &Matrix<M, N>, y:&Vector<M>, opt: Optimizer) -> Self {
         let initial_theta = Vector::<N>::zeros();
         let mut curr_model = LinearRegressor{theta: initial_theta};
-        opt.optimize(&mut curr_model, x, y);
+        let mse = opt.optimize(&mut curr_model, x, y);
+        println!("Finished training, MSE: {mse}");
         return curr_model;
     }
 

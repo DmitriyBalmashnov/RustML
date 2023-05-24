@@ -60,7 +60,7 @@ fn main() {
     let (x_data, y_data) = housedata.to_xy_data();
     let x = Matrix::from_data(x_data);
     let y = Vector::from_data(y_data);
-    let lin_reg = LinearRegressor::train(&x, &y, Optimizer::Adam(AdamParams::default()));
+    let lin_reg = LinearRegressor::train(&x, &y, Optimizer::PseudoInverse);
 
     let expected_cost = lin_reg.predict(&Vector::from_array([7420.0, 4.0, 2.0, 3.0, 1.0]));
     println!("Expected cost: {}", expected_cost)
