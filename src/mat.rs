@@ -95,6 +95,14 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
     pub fn to_data(self) -> [[f64; N]; M] {
         return self.data.clone()
     }
+
+    pub fn svd(self) => 
+}
+
+struct SVD<const M, const N>{
+    u: Matrix<M, M<,
+    s: Matrix<M, N<,
+    v: Matrix<N, N>
 }
 
 impl<const M: usize> Matrix<M, M> {
