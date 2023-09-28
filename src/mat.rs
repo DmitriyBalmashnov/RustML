@@ -1,6 +1,9 @@
 use std::ops::{Add, Mul, Sub, Index, IndexMut};
 use std::fmt;
-use std::error::Error;
+extern crate nalgebra as na;
+use self::na::Dyn;
+
+use self::na::Matrix as nam;
 
 #[derive(Clone)]
 pub struct Matrix<const M: usize, const N: usize> {
@@ -96,13 +99,18 @@ impl<const M: usize, const N: usize> Matrix<M, N> {
         return self.data.clone()
     }
 
-    pub fn svd(self) => 
-}
+    pub fn pseudo_inverse(&self) -> Matrix<N, M>{
+        //Use nalgebra svd implementation
+        let flat_data: Vec<f64> = self.data.iter().flatten().map(|x| *x).collect::<Vec<f64>>();
+        let matrix: nam<f64, Dyn, Dyn, na::VecStorage<f64, Dyn, Dyn>> = nam::<f64, Dyn, Dyn, na::VecStorage<f64, Dyn, Dyn>>::from_row_slice(M, N, flat_data.as_slice());
+        let svd = matrix.svd(true, true);
 
-struct SVD<const M, const N>{
-    u: Matrix<M, M<,
-    s: Matrix<M, N<,
-    v: Matrix<N, N>
+        let ps_i = svd.pseudo_inverse(f64::EPSILON).unwrap();
+        let mut result = Matrix::<N, M>::zeros();
+        for i in 0..N { for j in 0..M { result[i][j] = ps_i[(i, j)]}}
+
+        return result;
+    }
 }
 
 impl<const M: usize> Matrix<M, M> {
@@ -158,7 +166,15 @@ impl<const M: usize> Vector<M> {
         return f64::sqrt(self.dot(&self))
     }
 
-    fn dot(&self, other: &Self) -> f64 {
+    pub fn pow(&self, power: f64) -> Self{
+        let mut new_data = [[0.0; 1];M];
+        for i in 0..M {
+            new_data[i][0] = f64::powf(self[i][0], power);
+        }
+        return Vector{data:new_data}
+    }
+
+    pub fn dot(&self, other: &Self) -> f64 {
         let mut sum = 0.0;
         for i in 0..M {
             sum += self[i][0] * other[i][0]
